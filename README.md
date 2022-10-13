@@ -57,6 +57,7 @@
     <li>uploads</li>
     <li>chats</li>
 </ul>
+
 2. Create Users loopback APIs along with Mongodb Nosql database for Managing Users
    GET -> this API will fetch users from Mongodb and display in browser
    POST -> this API will add new user  
