@@ -1,10 +1,47 @@
-import React from "react";
+import { ToastContainer } from "react-toastify";
+import { Route, Routes } from "react-router-dom";
+import {
+  ErrorPage,
+  Login,
+  LoginSuccess,
+  Logout,
+  Register,
+  RegisterSuccess,
+  Welcome,
+} from "./pages";
+import "react-loading-skeleton/dist/skeleton.css";
+import "react-toastify/dist/ReactToastify.min.css";
+import "font-awesome/css/font-awesome.css";
+import "./styles/app.scss";
+import PrivateRoutes from "./utils/PrivateRoutes";
 
 function App() {
   return (
-    <div className="App">
-      <h1>Hello World</h1>
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<PrivateRoutes />}>
+          {/* <Route index element={<Navigate to"/users-list" />}/> */}
+          <Route element={<LoginSuccess />} path="/login-success" />
+          {/* <Route element={<GroupChat />} path="/group-chat" />
+          <Route element={<UsersList />} path="/users-list" />
+          <Route element={<EditUser />} path="/edit-user/:id" />
+          <Route element={<DocsList />} path="/docs-list" />
+          <Route element={<Share />} path="/share/:id" /> */}
+        </Route>
+        <Route element={<Logout />} path="/logout" />
+        <Route element={<Welcome />} path="/welcome" />
+        <Route element={<Login />} path="/login" />
+        <Route element={<Register />} path="/register" />
+        <Route element={<RegisterSuccess />} path="/register-success" />
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
+      <ToastContainer
+        position="top-center"
+        autoClose={2500}
+        closeButton={false}
+        newestOnTop={true}
+      />
+    </>
   );
 }
 
