@@ -9,11 +9,11 @@ import {
   RegisterSuccess,
   Welcome,
 } from "./pages";
+import PrivateRoutes from "./utils/PrivateRoutes";
 import "react-loading-skeleton/dist/skeleton.css";
 import "react-toastify/dist/ReactToastify.min.css";
 import "font-awesome/css/font-awesome.css";
 import "./styles/app.scss";
-import PrivateRoutes from "./utils/PrivateRoutes";
 
 function App() {
   return (

@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { FC } from "react";
+import { Link, Navigate } from "react-router-dom";
 import classes from "../styles/login.module.scss";
+import { isLoggedIn } from "../utils/helpers";
 
-const RegisterSuccess = () => {
+const RegisterSuccess: FC = () => {
+  if (isLoggedIn()) return <Navigate to="/" />;
   return (
     <div className={classes.container}>
       <h3>Registration Successful</h3>

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { IUser } from "../config/types";
 import { fetchLoggedInUser } from "../utils/apiCalls";
 import classes from "../styles/login-success.module.scss";
 
-const LoginSuccess = () => {
+const LoginSuccess: FC = () => {
   const [user, setUser] = useState<IUser[]>({} as IUser[]);
   useEffect(() => {
     const fetch = async () => {
@@ -21,7 +21,7 @@ const LoginSuccess = () => {
   return (
     <div className={classes.container}>
       <h3>Login Successful</h3>
-      <p className="login-success-p">
+      <p>
         Welcome ! <span>{user[0]?.email}</span>
       </p>
     </div>

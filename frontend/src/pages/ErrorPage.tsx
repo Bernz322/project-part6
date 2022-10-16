@@ -1,8 +1,13 @@
+import { FC } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../components";
 import classes from "../styles/error-page.module.scss";
 
-const ErrorPage = () => {
+const ErrorPage: FC = () => {
+  let buttonText: string = "Click here to return to home page";
+  let buttonType: string = "unstyled";
+  let buttonVariant: string = "cyan";
+
   return (
     <div className={classes.errorPage}>
       <h1>Oops!</h1>
@@ -12,9 +17,9 @@ const ErrorPage = () => {
       </p>
       <Link to="/">
         <Button
-          text="Click here to return to home page"
-          type="unstyled"
-          variant="cyan"
+          text={buttonText}
+          type={buttonType}
+          variant={buttonVariant}
           bold
         />
       </Link>

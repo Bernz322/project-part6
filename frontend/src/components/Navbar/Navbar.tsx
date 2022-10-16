@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { authLogout } from "../../features/auth/authSlice";
 import { useTypedDispatch } from "../../hooks/rtk-hooks";
@@ -9,11 +10,11 @@ const Navbar = () => {
   const navigate = useNavigate();
   const path = location.pathname.split("/")[1];
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(authLogout()).then(() => {
       navigate("/logout");
     });
-  };
+  }, [dispatch, navigate]);
 
   return (
     <nav>

@@ -1,14 +1,14 @@
-import { FormEvent, useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FC, FormEvent, useCallback, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../components";
 import { IResponse } from "../config/types";
 import { authRegister } from "../features/auth/authSlice";
 import { useTypedDispatch, useTypedSelector } from "../hooks/rtk-hooks";
-import { validateEmail } from "../utils/helpers";
+import { isLoggedIn, validateEmail } from "../utils/helpers";
 import classes from "../styles/login.module.scss";
 
-const Register = () => {
+const Register: FC = () => {
   const { isLoading } = useTypedSelector((state) => state.auth);
   const dispatch = useTypedDispatch();
   const navigate = useNavigate();
@@ -16,8 +16,9 @@ const Register = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  let buttonText = "Register";
-  let buttonVariant = "cyan";
+
+  let buttonText: string = "Register";
+  let buttonVariant: string = "cyan";
 
   const handleRegister = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -41,6 +42,9 @@ const Register = () => {
     },
     [name, email, password, confirmPassword, dispatch, navigate]
   );
+
+  if (isLoggedIn()) return <Navigate to="/" />;
+
   return (
     <div className={classes.container}>
       <h3>Register</h3>

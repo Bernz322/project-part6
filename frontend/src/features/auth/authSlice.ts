@@ -2,6 +2,7 @@ import {
   ActionReducerMapBuilder,
   createAsyncThunk,
   createSlice,
+  PayloadAction,
 } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { login, register } from "../../utils/apiCalls";
@@ -29,7 +30,7 @@ export const authLogin = createAsyncThunk(
       const res = await login(data.email, data.password);
       return res;
     } catch (error: any) {
-      const message =
+      const message: string =
         (error.response &&
           error.response.data &&
           error.response.data.message) ||
@@ -49,7 +50,7 @@ export const authRegister = createAsyncThunk(
       const res = await register(data.name, data.email, data.password);
       return res;
     } catch (error: any) {
-      const message =
+      const message: string =
         (error.response &&
           error.response.data &&
           error.response.data.message) ||
@@ -76,7 +77,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    authReset: (state) => {
+    authReset: (state: AuthState) => {
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
@@ -85,42 +86,48 @@ const authSlice = createSlice({
   },
   extraReducers: (builder: ActionReducerMapBuilder<AuthState>) => {
     builder
-      .addCase(authLogin.pending, (state) => {
+      .addCase(authLogin.pending, (state: AuthState) => {
         state.isLoading = true;
         state.isError = false;
         state.isSuccess = false;
         state.message = "";
       })
-      .addCase(authLogin.fulfilled, (state) => {
+      .addCase(authLogin.fulfilled, (state: AuthState) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
         state.message = "";
       })
-      .addCase(authLogin.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload;
-      })
-      .addCase(authRegister.pending, (state) => {
+      .addCase(
+        authLogin.rejected,
+        (state: AuthState, action: PayloadAction<any>) => {
+          state.isLoading = false;
+          state.isError = true;
+          state.isSuccess = false;
+          state.message = action.payload;
+        }
+      )
+      .addCase(authRegister.pending, (state: AuthState) => {
         state.isLoading = true;
         state.isError = false;
         state.isSuccess = false;
         state.message = "";
       })
-      .addCase(authRegister.fulfilled, (state) => {
+      .addCase(authRegister.fulfilled, (state: AuthState) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
         state.message = "";
       })
-      .addCase(authRegister.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = action.payload;
-      });
+      .addCase(
+        authRegister.rejected,
+        (state: AuthState, action: PayloadAction<any>) => {
+          state.isLoading = false;
+          state.isError = true;
+          state.isSuccess = false;
+          state.message = action.payload;
+        }
+      );
   },
 });
 
