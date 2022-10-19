@@ -1,6 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {User} from './user.model';
 
-@model({settings: {strict: false}})
+@model()
 export class Chat extends Entity {
   @property({
     type: 'string',
@@ -8,12 +9,6 @@ export class Chat extends Entity {
     generated: true,
   })
   id?: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  user_id: string;
 
   @property({
     type: 'string',
@@ -27,11 +22,8 @@ export class Chat extends Entity {
   })
   time: string;
 
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
+  @belongsTo(() => User, {name: 'user'})
+  sender_id: string;
 
   constructor(data?: Partial<Chat>) {
     super(data);

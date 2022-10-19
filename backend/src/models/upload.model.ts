@@ -1,6 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {User} from './user.model';
 
-@model({settings: {strict: false}})
+@model()
 export class Upload extends Entity {
   @property({
     type: 'string',
@@ -25,13 +26,7 @@ export class Upload extends Entity {
     type: 'string',
     required: true,
   })
-  file: string;
-
-  @property({
-    type: 'string',
-    required: true,
-  })
-  uploader: string;
+  fileLocation: string;
 
   @property({
     type: 'array',
@@ -40,11 +35,8 @@ export class Upload extends Entity {
   })
   sharedTo: string[];
 
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
+  @belongsTo(() => User, {name: 'user'})
+  uploader_id: string;
 
   constructor(data?: Partial<Upload>) {
     super(data);

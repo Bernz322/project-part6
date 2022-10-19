@@ -1,6 +1,21 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Chat} from './chat.model';
+import {Upload} from './upload.model';
 
-@model({settings: {strict: false}})
+@model({
+  settings: {
+    indexes: {
+      uniqueEmail: {
+        keys: {
+          email: 1,
+        },
+        options: {
+          unique: true,
+        },
+      },
+    },
+  },
+})
 export class User extends Entity {
   @property({
     type: 'string',
@@ -27,11 +42,11 @@ export class User extends Entity {
   })
   password: string;
 
-  // Define well-known properties here
+  @hasMany(() => Chat, {keyTo: 'sender_id'})
+  messages: Chat[];
 
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
+  @hasMany(() => Upload, {keyTo: 'uploader_id'})
+  uploads: Upload[];
 
   constructor(data?: Partial<User>) {
     super(data);
