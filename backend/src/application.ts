@@ -1,5 +1,5 @@
 import {BootMixin} from '@loopback/boot';
-import {ApplicationConfig} from '@loopback/core';
+import {ApplicationConfig, createBindingFromClass} from '@loopback/core';
 import {
   RestExplorerBindings,
   RestExplorerComponent,
@@ -9,6 +9,7 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
+import {ErrorHandlerMiddlewareProvider} from './middlewares';
 
 export {ApplicationConfig};
 
@@ -40,5 +41,11 @@ export class BackendApplication extends BootMixin(
         nested: true,
       },
     };
+
+    this.setUpBindings();
+  }
+
+  setUpBindings(): void {
+    this.add(createBindingFromClass(ErrorHandlerMiddlewareProvider));
   }
 }
