@@ -16,17 +16,7 @@ import _ from 'lodash';
 import {validateCredentials} from '../services/';
 import {User} from '../models';
 import {UserRepository} from '../repositories';
-
-export type CredentialsType = {
-  email: string;
-  password: string;
-};
-
-export type LoginReturnType = {
-  id: string;
-  email: string;
-  name: string;
-};
+import {CredentialsType} from '../types';
 
 const CredentialsSchema: SchemaObject = {
   type: 'object',
@@ -132,7 +122,6 @@ export class UserController {
     );
   }
 
-  // @authenticate('jwt')
   @get('/users/{id}')
   @response(200, {
     description: 'Return user by ID',
@@ -185,6 +174,10 @@ export class UserController {
     description: 'Delete user by ID',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
+    // TODO delete chats and uploads of this user
+    /**
+     * Axios call /users/{id}/uploads & /users/{id}/chats to delete chats and uploads
+     */
     await this.userRepository.deleteById(id);
   }
 }

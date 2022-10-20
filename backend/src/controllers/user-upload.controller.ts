@@ -11,9 +11,6 @@ import {
   getModelSchemaRef,
   getWhereSchemaFor,
   param,
-  patch,
-  post,
-  requestBody,
 } from '@loopback/rest';
 import {User, Upload} from '../models';
 import {UserRepository} from '../repositories';
@@ -26,7 +23,7 @@ export class UserUploadController {
   @get('/users/{id}/uploads', {
     responses: {
       '200': {
-        description: 'Array of User has many Upload',
+        description: 'Return all uploads of the user (provide id)',
         content: {
           'application/json': {
             schema: {type: 'array', items: getModelSchemaRef(Upload)},
@@ -42,60 +39,10 @@ export class UserUploadController {
     return this.userRepository.uploads(id).find(filter);
   }
 
-  @post('/users/{id}/uploads', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Upload)}},
-      },
-    },
-  })
-  async create(
-    @param.path.string('id') id: typeof User.prototype.id,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Upload, {
-            title: 'NewUploadInUser',
-            exclude: ['id'],
-            optional: ['uploader_id'],
-          }),
-        },
-      },
-    })
-    upload: Omit<Upload, 'id'>,
-  ): Promise<Upload> {
-    return this.userRepository.uploads(id).create(upload);
-  }
-
-  @patch('/users/{id}/uploads', {
-    responses: {
-      '200': {
-        description: 'User.Upload PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async patch(
-    @param.path.string('id') id: string,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Upload, {partial: true}),
-        },
-      },
-    })
-    upload: Partial<Upload>,
-    @param.query.object('where', getWhereSchemaFor(Upload))
-    where?: Where<Upload>,
-  ): Promise<Count> {
-    return this.userRepository.uploads(id).patch(upload, where);
-  }
-
   @del('/users/{id}/uploads', {
     responses: {
       '200': {
-        description: 'User.Upload DELETE success count',
+        description: 'Delete all user uploads (provide user id in the url)',
         content: {'application/json': {schema: CountSchema}},
       },
     },
