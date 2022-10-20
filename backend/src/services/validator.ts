@@ -1,6 +1,6 @@
 import isemail from 'isemail';
 import {HttpErrors} from '@loopback/rest';
-import {CredentialsType} from '../controllers';
+import {CredentialsType} from '../types';
 
 export function validateCredentials(credentials: CredentialsType) {
   // Validate Email
