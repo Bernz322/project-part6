@@ -4,7 +4,6 @@ import {
   param,
   get,
   getModelSchemaRef,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -19,7 +18,7 @@ export class ChatController {
 
   @post('/chats')
   @response(200, {
-    description: 'Chat model instance',
+    description: 'Create new chat message',
     content: {'application/json': {schema: getModelSchemaRef(Chat)}},
   })
   async create(
@@ -40,7 +39,7 @@ export class ChatController {
 
   @get('/chats')
   @response(200, {
-    description: 'Array of Chat model instances',
+    description: 'Return array of all chats',
     content: {
       'application/json': {
         schema: {
@@ -63,13 +62,5 @@ export class ChatController {
         },
       ],
     });
-  }
-
-  @del('/chats/{id}')
-  @response(204, {
-    description: 'Chat DELETE success',
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.chatRepository.deleteById(id);
   }
 }
