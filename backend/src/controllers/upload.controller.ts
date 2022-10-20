@@ -1,6 +1,5 @@
+import {inject} from '@loopback/core';
 import {
-  Count,
-  CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
@@ -12,55 +11,67 @@ import {
   get,
   getModelSchemaRef,
   patch,
-  put,
   del,
   requestBody,
   response,
+  Request,
+  RestBindings,
+  Response,
 } from '@loopback/rest';
+import {FILE_UPLOAD_SERVICE} from '../keys';
 import {Upload} from '../models';
 import {UploadRepository} from '../repositories';
+import {FileUploadHandler} from '../types';
 
 export class UploadController {
   constructor(
     @repository(UploadRepository)
-    public uploadRepository : UploadRepository,
+    public uploadRepository: UploadRepository,
+    @inject(FILE_UPLOAD_SERVICE) private handler: FileUploadHandler,
   ) {}
 
   @post('/uploads')
   @response(200, {
-    description: 'Upload model instance',
+    description: 'Create new upload',
     content: {'application/json': {schema: getModelSchemaRef(Upload)}},
   })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Upload, {
-            title: 'NewUpload',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    upload: Omit<Upload, 'id'>,
-  ): Promise<Upload> {
-    return this.uploadRepository.create(upload);
+  async fileUpload(
+    @requestBody.file()
+    request: Request,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ): Promise<any> {
+    const uploadConfig = new Promise<object>((resolve, reject) => {
+      return this.handler(request, response, (err: unknown) => {
+        if (err) reject(err);
+        else {
+          return resolve(UploadController.getFilesAndFields(request));
+        }
+      });
+    });
+
+    const uploadData = await uploadConfig;
+    this.uploadRepository.create(uploadData);
   }
 
-  @get('/uploads/count')
-  @response(200, {
-    description: 'Upload model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(Upload) where?: Where<Upload>,
-  ): Promise<Count> {
-    return this.uploadRepository.count(where);
-  }
+  /**
+   * Get files and fields for the request
+   * @param request - Http request
+   */
+  public static getFilesAndFields = (request: Request) => {
+    const uploadedFiles: any = request.files;
+    const toSave = {
+      label: request.body.label,
+      fileName: request.body.fileName,
+      fileLocation: uploadedFiles[0].filename,
+      uploader_id: request.body.uploader_id,
+      sharedTo: [],
+    };
+    return toSave;
+  };
 
   @get('/uploads')
   @response(200, {
-    description: 'Array of Upload model instances',
+    description: 'Return array of all uploads',
     content: {
       'application/json': {
         schema: {
@@ -70,34 +81,13 @@ export class UploadController {
       },
     },
   })
-  async find(
-    @param.filter(Upload) filter?: Filter<Upload>,
-  ): Promise<Upload[]> {
+  async find(@param.filter(Upload) filter?: Filter<Upload>): Promise<Upload[]> {
     return this.uploadRepository.find(filter);
-  }
-
-  @patch('/uploads')
-  @response(200, {
-    description: 'Upload PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Upload, {partial: true}),
-        },
-      },
-    })
-    upload: Upload,
-    @param.where(Upload) where?: Where<Upload>,
-  ): Promise<Count> {
-    return this.uploadRepository.updateAll(upload, where);
   }
 
   @get('/uploads/{id}')
   @response(200, {
-    description: 'Upload model instance',
+    description: 'Return upload by ID',
     content: {
       'application/json': {
         schema: getModelSchemaRef(Upload, {includeRelations: true}),
@@ -106,14 +96,15 @@ export class UploadController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Upload, {exclude: 'where'}) filter?: FilterExcludingWhere<Upload>
+    @param.filter(Upload, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Upload>,
   ): Promise<Upload> {
     return this.uploadRepository.findById(id, filter);
   }
 
   @patch('/uploads/{id}')
   @response(204, {
-    description: 'Upload PATCH success',
+    description: 'Update upload by ID',
   })
   async updateById(
     @param.path.string('id') id: string,
@@ -129,22 +120,13 @@ export class UploadController {
     await this.uploadRepository.updateById(id, upload);
   }
 
-  @put('/uploads/{id}')
-  @response(204, {
-    description: 'Upload PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() upload: Upload,
-  ): Promise<void> {
-    await this.uploadRepository.replaceById(id, upload);
-  }
-
   @del('/uploads/{id}')
   @response(204, {
-    description: 'Upload DELETE success',
+    description: 'Delete upload by ID',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.uploadRepository.deleteById(id);
   }
+
+  // TODO Share/unshare, download, return all uploads shared to user
 }

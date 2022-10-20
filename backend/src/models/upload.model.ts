@@ -31,9 +31,8 @@ export class Upload extends Entity {
   @property({
     type: 'array',
     itemType: 'string',
-    required: true,
   })
-  sharedTo: string[];
+  sharedTo?: string[];
 
   @belongsTo(() => User, {name: 'user'})
   uploader_id: string;
