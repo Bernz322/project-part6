@@ -152,6 +152,58 @@ export class UploadController {
     await this.uploadRepository.updateById(id, upload);
   }
 
+  @patch('/uploads/{id}/share')
+  @response(204, {
+    description: 'Share upload to a user',
+  })
+  async shareUpload(
+    @param.path.string('id') id: string,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Upload, {partial: true}),
+        },
+      },
+    })
+    upload: Upload | any,
+  ): Promise<void> {
+    const uploadData: Upload = await this.uploadRepository.findById(id);
+    const userId = upload.sharedTo[0];
+    const sharedTo = uploadData.sharedTo;
+    sharedTo?.splice(0, 0, userId);
+    const data = {
+      sharedTo,
+    };
+
+    await this.uploadRepository.updateById(id, data);
+  }
+
+  @patch('/uploads/{id}/unshare')
+  @response(204, {
+    description: 'Unshare upload to a user',
+  })
+  async unShareUpload(
+    @param.path.string('id') id: string,
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Upload, {partial: true}),
+        },
+      },
+    })
+    upload: Upload | any,
+  ): Promise<void> {
+    const uploadData: Upload = await this.uploadRepository.findById(id);
+    const userId = upload.sharedTo[0];
+    const newSharedTo = uploadData.sharedTo?.filter(id => {
+      return id !== userId;
+    });
+    const data = {
+      sharedTo: newSharedTo,
+    };
+    await this.uploadRepository.updateById(id, data);
+  }
+
   @del('/uploads/{id}')
   @response(204, {
     description: 'Delete upload by ID',
@@ -160,5 +212,5 @@ export class UploadController {
     await this.uploadRepository.deleteById(id);
   }
 
-  // TODO Share/unshare, download, return all uploads shared to user
+  // TODO return all uploads shared to user
 }
