@@ -1,10 +1,5 @@
 import {inject} from '@loopback/core';
-import {
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -17,8 +12,11 @@ import {
   Request,
   RestBindings,
   Response,
+  oas,
+  HttpErrors,
 } from '@loopback/rest';
-import {FILE_UPLOAD_SERVICE} from '../keys';
+import path from 'path';
+import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {Upload} from '../models';
 import {UploadRepository} from '../repositories';
 import {FileUploadHandler} from '../types';
@@ -28,6 +26,7 @@ export class UploadController {
     @repository(UploadRepository)
     public uploadRepository: UploadRepository,
     @inject(FILE_UPLOAD_SERVICE) private handler: FileUploadHandler,
+    @inject(STORAGE_DIRECTORY) private storageDirectory: string,
   ) {}
 
   @post('/uploads')
@@ -69,6 +68,30 @@ export class UploadController {
     return toSave;
   };
 
+  @get('/download/{filename}')
+  @oas.response.file()
+  downloadFile(
+    @param.path.string('filename') fileName: string,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
+    const file = this.validateFileName(fileName);
+    const index = fileName.lastIndexOf('-'); // file-name.exe-123456789, get index of the last "-"
+    const renamedFile = fileName.slice(0, index); // file-name.exe, return the string before "-"
+    response.download(file, renamedFile); // when downloading the file, return the "renamedFile" as its file name to make it look original
+    return response;
+  }
+
+  /**
+   * Validate file names to prevent them goes beyond the designated directory
+   * @param fileName - File name
+   */
+  private validateFileName(fileName: string) {
+    const resolved = path.resolve(this.storageDirectory, fileName);
+    if (resolved.startsWith(this.storageDirectory)) return resolved;
+    // The resolved file is outside sandbox
+    throw new HttpErrors.BadRequest(`Invalid file name: ${fileName}`);
+  }
+
   @get('/uploads')
   @response(200, {
     description: 'Return array of all uploads',
@@ -82,7 +105,16 @@ export class UploadController {
     },
   })
   async find(@param.filter(Upload) filter?: Filter<Upload>): Promise<Upload[]> {
-    return this.uploadRepository.find(filter);
+    return this.uploadRepository.find({
+      include: [
+        {
+          relation: 'user',
+          scope: {
+            fields: {id: false, password: false},
+          },
+        },
+      ],
+    });
   }
 
   @get('/uploads/{id}')

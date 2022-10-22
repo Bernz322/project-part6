@@ -56,8 +56,6 @@ export class ChatController {
           relation: 'user',
           scope: {
             fields: {id: false, password: false},
-            // If we have another relation in here, we can do
-            //  include: [{ relation: 'products' }],
           },
         },
       ],
