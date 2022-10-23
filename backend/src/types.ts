@@ -7,8 +7,14 @@ export type CredentialsType = {
 
 export type FileUploadHandler = RequestHandler;
 
+interface ISharedToUsers {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export type UploadGetById = {
-  sharedToUsers: any;
+  sharedToUsers: ISharedToUsers[];
   id?: string | undefined;
   label: string;
   fileName: string;
