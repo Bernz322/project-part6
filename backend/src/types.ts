@@ -6,3 +6,13 @@ export type CredentialsType = {
 };
 
 export type FileUploadHandler = RequestHandler;
+
+export type UploadGetById = {
+  sharedToUsers: any;
+  id?: string | undefined;
+  label: string;
+  fileName: string;
+  fileLocation: string;
+  sharedTo?: string[] | undefined;
+  uploader_id: string;
+};

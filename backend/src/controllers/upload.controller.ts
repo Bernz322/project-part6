@@ -18,13 +18,15 @@ import {
 import path from 'path';
 import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {Upload} from '../models';
-import {UploadRepository} from '../repositories';
-import {FileUploadHandler} from '../types';
+import {UploadRepository, UserRepository} from '../repositories';
+import {FileUploadHandler, UploadGetById} from '../types';
 
 export class UploadController {
   constructor(
     @repository(UploadRepository)
     public uploadRepository: UploadRepository,
+    @repository(UserRepository)
+    public userRepository: UserRepository,
     @inject(FILE_UPLOAD_SERVICE) private handler: FileUploadHandler,
     @inject(STORAGE_DIRECTORY) private storageDirectory: string,
   ) {}
@@ -38,7 +40,7 @@ export class UploadController {
     @requestBody.file()
     request: Request,
     @inject(RestBindings.Http.RESPONSE) response: Response,
-  ): Promise<any> {
+  ): Promise<void> {
     const uploadConfig = new Promise<object>((resolve, reject) => {
       return this.handler(request, response, (err: unknown) => {
         if (err) reject(err);
@@ -105,16 +107,19 @@ export class UploadController {
     },
   })
   async find(@param.filter(Upload) filter?: Filter<Upload>): Promise<Upload[]> {
-    return this.uploadRepository.find({
-      include: [
-        {
-          relation: 'user',
-          scope: {
-            fields: {id: false, password: false},
+    return this.uploadRepository.find(
+      {
+        include: [
+          {
+            relation: 'user',
+            scope: {
+              fields: {id: false, password: false},
+            },
           },
-        },
-      ],
-    });
+        ],
+      },
+      {fields: {sharedTo: false}},
+    );
   }
 
   @get('/uploads/{id}')
@@ -130,8 +135,34 @@ export class UploadController {
     @param.path.string('id') id: string,
     @param.filter(Upload, {exclude: 'where'})
     filter?: FilterExcludingWhere<Upload>,
-  ): Promise<Upload> {
-    return this.uploadRepository.findById(id, filter);
+  ): Promise<UploadGetById> {
+    const uploadData: Upload = await this.uploadRepository.findById(id, {
+      include: [
+        {
+          relation: 'user',
+          scope: {
+            fields: {id: false, password: false},
+          },
+        },
+      ],
+    });
+
+    const usersArray = await this.userRepository.find({
+      fields: {password: false},
+    });
+
+    const sharedIdArray = uploadData.sharedTo;
+    let sharedToUsers = [];
+
+    for (let i = 0; i < sharedIdArray.length; i++) {
+      for (let j = 0; j < usersArray.length; j++) {
+        if (sharedIdArray[i] === usersArray[j].id) {
+          sharedToUsers.push(usersArray[j]);
+        }
+      }
+    }
+    const toReturn = {...uploadData, sharedToUsers};
+    return toReturn;
   }
 
   @patch('/uploads/{id}')
@@ -165,7 +196,7 @@ export class UploadController {
         },
       },
     })
-    upload: Upload | any,
+    upload: Upload,
   ): Promise<void> {
     const uploadData: Upload = await this.uploadRepository.findById(id);
     const userId = upload.sharedTo[0];
@@ -191,7 +222,7 @@ export class UploadController {
         },
       },
     })
-    upload: Upload | any,
+    upload: Upload,
   ): Promise<void> {
     const uploadData: Upload = await this.uploadRepository.findById(id);
     const userId = upload.sharedTo[0];
@@ -209,8 +240,12 @@ export class UploadController {
     description: 'Delete upload by ID',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
+    // unlink file
     await this.uploadRepository.deleteById(id);
   }
 
-  // TODO return all uploads shared to user
+  // TODO return all uploads shared to user, no need to return all user data inside sharedTo array.
+  // Create endpoint for getting all shared uploads by providing user id to it
+  // Unlink files inside server when it is deleted
+  // call delete chat and upload when user is deleted using axios
 }

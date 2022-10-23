@@ -116,10 +116,7 @@ export class UserController {
     },
   })
   async find(@param.filter(User) filter?: Filter<User>): Promise<User[]> {
-    return this.userRepository.find(
-      {include: ['messages', 'uploads']},
-      {fields: {password: false}},
-    );
+    return this.userRepository.find({fields: {password: false}});
   }
 
   @get('/users/{id}')
@@ -135,11 +132,7 @@ export class UserController {
     @param.path.string('id') id: string,
     @param.filter(User, {exclude: 'where'}) filter?: FilterExcludingWhere<User>,
   ): Promise<User> {
-    return this.userRepository.findById(
-      id,
-      {include: ['messages', 'uploads']},
-      {fields: {password: false}},
-    );
+    return this.userRepository.findById(id, {fields: {password: false}});
   }
 
   @patch('/users/{id}')
