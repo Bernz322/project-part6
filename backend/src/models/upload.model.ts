@@ -1,4 +1,10 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {
+  Entity,
+  model,
+  property,
+  belongsTo,
+  referencesMany,
+} from '@loopback/repository';
 import {User} from './user.model';
 
 @model()
@@ -28,11 +34,13 @@ export class Upload extends Entity {
   })
   fileLocation: string;
 
+  // @referencesMany(() => User)
+  // sharedTo: string[];
   @property({
     type: 'array',
     itemType: 'string',
   })
-  sharedTo?: string[];
+  sharedTo: string[];
 
   @belongsTo(() => User, {name: 'user'})
   uploader_id: string;

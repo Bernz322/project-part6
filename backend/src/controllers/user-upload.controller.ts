@@ -12,7 +12,7 @@ import {
   getWhereSchemaFor,
   param,
 } from '@loopback/rest';
-import {User, Upload} from '../models';
+import {Upload} from '../models';
 import {UserRepository} from '../repositories';
 
 export class UserUploadController {
@@ -52,6 +52,7 @@ export class UserUploadController {
     @param.query.object('where', getWhereSchemaFor(Upload))
     where?: Where<Upload>,
   ): Promise<Count> {
+    // unlink file
     return this.userRepository.uploads(id).delete(where);
   }
 }
