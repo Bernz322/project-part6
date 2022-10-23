@@ -152,15 +152,9 @@ export class UploadController {
     });
 
     const sharedIdArray = uploadData.sharedTo;
-    let sharedToUsers = [];
-
-    for (let i = 0; i < sharedIdArray.length; i++) {
-      for (let j = 0; j < usersArray.length; j++) {
-        if (sharedIdArray[i] === usersArray[j].id) {
-          sharedToUsers.push(usersArray[j]);
-        }
-      }
-    }
+    const sharedToUsers = usersArray.filter(user =>
+      sharedIdArray.includes(user.id),
+    );
     const toReturn = {...uploadData, sharedToUsers};
     return toReturn;
   }
