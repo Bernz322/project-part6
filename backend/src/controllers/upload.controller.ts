@@ -16,6 +16,8 @@ import {
   HttpErrors,
 } from '@loopback/rest';
 import path from 'path';
+import _ from 'lodash';
+import fs from 'fs';
 import {FILE_UPLOAD_SERVICE, STORAGE_DIRECTORY} from '../keys';
 import {Upload} from '../models';
 import {UploadRepository, UserRepository} from '../repositories';
@@ -152,11 +154,62 @@ export class UploadController {
     });
 
     const sharedIdArray = uploadData.sharedTo;
+    const uploader = _.toString(uploadData.uploader_id);
     const sharedToUsers = usersArray.filter(user =>
       sharedIdArray.includes(user.id),
     );
-    const toReturn = {...uploadData, sharedToUsers};
+
+    const notSharedToUsers = usersArray.filter(user => {
+      return (
+        sharedIdArray.filter(userSharedTo => {
+          return userSharedTo === user.id;
+        }).length === 0
+      );
+    });
+
+    let availToShare = notSharedToUsers.filter(user => {
+      return _.toString(user.id) !== uploader;
+    });
+
+    const toReturn = {...uploadData, sharedToUsers, availToShare};
     return toReturn;
+  }
+
+  @get('/uploads/user/{id}')
+  @response(200, {
+    description: 'Return array of all shared uploads to user by ID',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Upload, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findByUserId(
+    @param.path.string('id') id: string,
+    @param.filter(Upload, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Upload>,
+  ): Promise<Upload[]> {
+    const allUploads = await this.uploadRepository.find({
+      include: [
+        {
+          relation: 'user',
+          scope: {
+            fields: {id: false, password: false},
+          },
+        },
+      ],
+    });
+    const user = await this.userRepository.findById(id, {
+      fields: {password: false},
+    });
+
+    let uploadsSharedToUser = allUploads.filter(upload => {
+      return upload.sharedTo.find(item => item === user.id);
+    });
+    return uploadsSharedToUser;
   }
 
   @patch('/uploads/{id}')
@@ -234,12 +287,16 @@ export class UploadController {
     description: 'Delete upload by ID',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    // unlink file
-    await this.uploadRepository.deleteById(id);
+    const uploadData: Upload = await this.uploadRepository.findById(id, {
+      fields: ['fileLocation'],
+    });
+    try {
+      fs.unlinkSync(
+        path.join(__dirname, `../../.sandbox/${uploadData.fileLocation}`),
+      );
+      await this.uploadRepository.deleteById(id);
+    } catch (err) {
+      console.log(err);
+    }
   }
-
-  // TODO return all uploads shared to user, no need to return all user data inside sharedTo array.
-  // Create endpoint for getting all shared uploads by providing user id to it
-  // Unlink files inside server when it is deleted
-  // call delete chat and upload when user is deleted using axios
 }
