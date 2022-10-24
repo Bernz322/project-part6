@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import classes from "./button.module.scss";
 
 type ButtonProps = {
   variant?: string;
@@ -51,7 +50,7 @@ const Button: FC<ButtonProps> = ({
 
   return (
     <button style={btnBgColor} onClick={click} disabled={loading}>
-      {loading ? <i className={`${classes.loader} fa fa-spinner`}></i> : text}
+      {loading ? <i className="fa fa-spinner"></i> : text}
     </button>
   );
 };

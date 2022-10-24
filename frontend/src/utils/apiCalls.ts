@@ -1,5 +1,11 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { IUser, ILoginResponse, IMessage, IUpload } from "../config/types";
+import {
+  IUser,
+  ILoginResponse,
+  IMessage,
+  IUpload,
+  ISendMessage,
+} from "../config/types";
 import { getCookie, setCookie } from "./helpers";
 
 const apiRequest = async <T>(
@@ -8,7 +14,7 @@ const apiRequest = async <T>(
 ): Promise<T> => {
   const token = getCookie("accessToken");
   const request = {
-    url: `http://localhost:5000${path}`,
+    url: `http://localhost:8888${path}`,
     ...config,
   };
 
@@ -29,16 +35,17 @@ export const login = async (
   email: string,
   password: string
 ): Promise<ILoginResponse> => {
-  const res = await apiRequest<ILoginResponse>(`/users/login`, {
+  const res = await apiRequest<ILoginResponse>(`/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     data: { email, password },
   });
+  console.log(res);
   if (res) {
-    setCookie({ cookieName: "accessToken", value: res.token, daysToExpire: 1 });
-    localStorage.setItem("loggedUser", JSON.stringify(res._id));
+    setCookie({ cookieName: "accessToken", value: res.id, daysToExpire: 1 });
+    localStorage.setItem("loggedUser", JSON.stringify(res.id));
   }
   return res;
 };
@@ -48,7 +55,7 @@ export const register = async (
   email: string,
   password: string
 ): Promise<void> => {
-  await apiRequest(`/users/register`, {
+  await apiRequest(`/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,17 +75,13 @@ export const fetchMessages = async (): Promise<IMessage[]> => {
   return res;
 };
 
-export const sendMessage = async (
-  user_id: string,
-  message: string,
-  time: string
-): Promise<IMessage> => {
+export const sendMessage = async (msg: ISendMessage): Promise<IMessage> => {
   const res = await apiRequest<IMessage>(`/chats`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    data: { user_id, message, time },
+    data: msg,
   });
   return res;
 };

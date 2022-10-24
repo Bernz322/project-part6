@@ -5,7 +5,7 @@ import { Button } from "../components";
 import { IResponse } from "../config/types";
 import { authRegister } from "../features/auth/authSlice";
 import { useTypedDispatch, useTypedSelector } from "../hooks/rtk-hooks";
-import { isLoggedIn, validateEmail } from "../utils/helpers";
+import { isLoggedIn, validateEmail, validName } from "../utils/helpers";
 import classes from "../styles/login.module.scss";
 
 const Register: FC = () => {
@@ -24,12 +24,15 @@ const Register: FC = () => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      if (!name) return toast.warn("Full name is required!");
-      if (!email) return toast.warn("Email is required!");
-      if (validateEmail(email)) return toast.warn("Invalid Email!");
-      if (!password) return toast.warn("Password is required!");
-      if (!confirmPassword) return toast.warn("Confirm your password!");
-      if (confirmPassword !== password)
+      if (!name.trim()) return toast.warn("Full name is required!");
+      if (!validName(name.trim())) return toast.warn("Invalid name!");
+      if (!email.trim()) return toast.warn("Email is required!");
+      if (validateEmail(email.trim())) return toast.warn("Invalid Email!");
+      if (!password.trim()) return toast.warn("Password is required!");
+      if (password.trim().length < 8)
+        return toast.warn("Password must be minimum of 8 characters!");
+      if (!confirmPassword.trim()) return toast.warn("Confirm your password!");
+      if (confirmPassword.trim() !== password.trim())
         return toast.warn("Your passwords do not match!");
 
       dispatch(authRegister({ name, email, password })).then(

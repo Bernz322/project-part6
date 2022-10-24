@@ -22,9 +22,11 @@ const Login = () => {
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      if (!email) return toast.warn("Email is required!");
+      if (!email.trim()) return toast.warn("Email is required!");
       if (validateEmail(email)) return toast.warn("Invalid Email!");
-      if (!password) return toast.warn("Password is required!");
+      if (!password.trim()) return toast.warn("Password is required!");
+      if (password.trim().length < 8)
+        return toast.warn("Password must be minimum of 8 characters!");
 
       dispatch(authLogin({ email, password })).then((res: IResponse) => {
         if (!res.error) {

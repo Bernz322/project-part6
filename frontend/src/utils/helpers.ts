@@ -46,6 +46,20 @@ export const validateEmail = (email: string): boolean => {
 };
 
 /**
+ * Validates name
+ * @param {string} name
+ * @returns {boolean}
+ */
+export const validName = (name: string): boolean => {
+  var nameRegex = /^(?!-)[a-zA-Z-]*[a-zA-Z]$/;
+  if (name.match(nameRegex) == null) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+/**
  * Get cookie in the browser
  * @param {string} name
  * @returns {boolean | string}

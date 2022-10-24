@@ -11,23 +11,28 @@ export interface IDeleteCookie {
 export interface ILoginResponse {
   email: string;
   name: string;
-  _id: string;
-  token: string;
+  id: string;
+  token?: string;
 }
 export interface IUser {
-  _id: string;
+  id: string;
   name: string;
   email: string;
 }
 export interface IMessage {
-  _id: string;
-  user_id: string;
+  id: string;
+  sender_id: string;
   message: string;
   time: string;
-  sender: ISender[];
+  user: ISender;
+}
+
+export interface ISendMessage {
+  message: string;
+  time: string;
+  sender_id: string;
 }
 export interface ISender {
-  _id: string;
   name: string;
   email?: string;
 }
