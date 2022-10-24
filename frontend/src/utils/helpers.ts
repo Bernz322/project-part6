@@ -6,7 +6,7 @@ import { IDeleteCookie, ISetCookie } from "../config/types";
  * @param {Array} data
  * @returns {Array}
  */
-export const tablePopulate = (data: any[]): any[] => {
+export const tablePopulate = <T>(data: T[]): T[] => {
   let len = data?.length;
   let size;
   size =
@@ -43,6 +43,20 @@ export const validateEmail = (email: string): boolean => {
     return true;
   }
   return false;
+};
+
+/**
+ * Validates name
+ * @param {string} name
+ * @returns {boolean}
+ */
+export const validName = (name: string): boolean => {
+  var nameRegex = /^(?!-)[a-zA-Z-]*[a-zA-Z]$/;
+  if (name.match(nameRegex) == null) {
+    return false;
+  } else {
+    return true;
+  }
 };
 
 /**

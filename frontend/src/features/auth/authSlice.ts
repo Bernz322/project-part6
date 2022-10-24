@@ -8,14 +8,14 @@ import { toast } from "react-toastify";
 import { login, register } from "../../utils/apiCalls";
 import { deleteCookie } from "../../utils/helpers";
 
-export interface AuthState {
+export interface IAuthState {
   isError: boolean;
   isSuccess: boolean;
   isLoading: boolean;
-  message: any;
+  message: string;
 }
 
-const initialState: AuthState = {
+const initialState: IAuthState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -33,7 +33,8 @@ export const authLogin = createAsyncThunk(
       const message: string =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       toast.error(message);
@@ -50,10 +51,12 @@ export const authRegister = createAsyncThunk(
       const res = await register(data.name, data.email, data.password);
       return res;
     } catch (error: any) {
+      console.log(error);
       const message: string =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       toast.error(message);
@@ -77,22 +80,22 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    authReset: (state: AuthState) => {
+    authReset: (state: IAuthState) => {
       state.isError = false;
       state.isSuccess = false;
       state.isLoading = false;
       state.message = "";
     },
   },
-  extraReducers: (builder: ActionReducerMapBuilder<AuthState>) => {
+  extraReducers: (builder: ActionReducerMapBuilder<IAuthState>) => {
     builder
-      .addCase(authLogin.pending, (state: AuthState) => {
+      .addCase(authLogin.pending, (state: IAuthState) => {
         state.isLoading = true;
         state.isError = false;
         state.isSuccess = false;
         state.message = "";
       })
-      .addCase(authLogin.fulfilled, (state: AuthState) => {
+      .addCase(authLogin.fulfilled, (state: IAuthState) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
@@ -100,20 +103,20 @@ const authSlice = createSlice({
       })
       .addCase(
         authLogin.rejected,
-        (state: AuthState, action: PayloadAction<any>) => {
+        (state: IAuthState, action: PayloadAction<any>) => {
           state.isLoading = false;
           state.isError = true;
           state.isSuccess = false;
           state.message = action.payload;
         }
       )
-      .addCase(authRegister.pending, (state: AuthState) => {
+      .addCase(authRegister.pending, (state: IAuthState) => {
         state.isLoading = true;
         state.isError = false;
         state.isSuccess = false;
         state.message = "";
       })
-      .addCase(authRegister.fulfilled, (state: AuthState) => {
+      .addCase(authRegister.fulfilled, (state: IAuthState) => {
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
@@ -121,7 +124,7 @@ const authSlice = createSlice({
       })
       .addCase(
         authRegister.rejected,
-        (state: AuthState, action: PayloadAction<any>) => {
+        (state: IAuthState, action: PayloadAction<any>) => {
           state.isLoading = false;
           state.isError = true;
           state.isSuccess = false;
