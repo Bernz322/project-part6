@@ -13,6 +13,7 @@ import {
 } from '@loopback/rest';
 import {genSalt, hash, compare} from 'bcryptjs';
 import _ from 'lodash';
+import axios from 'axios';
 import {validateCredentials} from '../services/';
 import {User} from '../models';
 import {UserRepository} from '../repositories';
@@ -167,10 +168,14 @@ export class UserController {
     description: 'Delete user by ID',
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
-    // TODO delete chats and uploads of this user
-    /**
-     * Axios call /users/{id}/uploads & /users/{id}/chats to delete chats and uploads
-     */
+    const baseUrlChats = `http://localhost:8888/users/${id}/chats`;
+    const baseUrlUploads = `http://localhost:8888/users/${id}/uploads`;
+    try {
+      await axios.delete(baseUrlChats);
+      await axios.delete(baseUrlUploads);
+    } catch (error) {
+      console.log(error);
+    }
     await this.userRepository.deleteById(id);
   }
 }
