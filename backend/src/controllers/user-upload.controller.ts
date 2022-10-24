@@ -12,12 +12,16 @@ import {
   getWhereSchemaFor,
   param,
 } from '@loopback/rest';
+import fs from 'fs';
+import path from 'path';
 import {Upload} from '../models';
-import {UserRepository} from '../repositories';
+import {UploadRepository, UserRepository} from '../repositories';
 
 export class UserUploadController {
   constructor(
     @repository(UserRepository) protected userRepository: UserRepository,
+    @repository(UploadRepository)
+    public uploadRepository: UploadRepository,
   ) {}
 
   @get('/users/{id}/uploads', {
@@ -52,7 +56,24 @@ export class UserUploadController {
     @param.query.object('where', getWhereSchemaFor(Upload))
     where?: Where<Upload>,
   ): Promise<Count> {
-    // unlink file
-    return this.userRepository.uploads(id).delete(where);
+    const uploads = await this.uploadRepository.find(
+      {
+        where: {uploader_id: id},
+      },
+      {
+        fields: ['fileLocation'],
+      },
+    );
+    try {
+      uploads.forEach(upload => {
+        fs.unlinkSync(
+          path.join(__dirname, `../../.sandbox/${upload.fileLocation}`),
+        );
+      });
+      return this.userRepository.uploads(id).delete(where);
+    } catch (err) {
+      console.error(err);
+      return {count: 0};
+    }
   }
 }
