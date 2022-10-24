@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "../components";
 import { ISendMessage } from "../config/types";
@@ -8,7 +8,7 @@ import { useTypedDispatch, useTypedSelector } from "../hooks/rtk-hooks";
 import classes from "../styles/group-chat.module.scss";
 import { getMessageDate } from "../utils/helpers";
 
-const GroupChat = () => {
+const GroupChat: FC = () => {
   const { chats, isLoading } = useTypedSelector((state) => state.chat);
   const { currentUser } = useTypedSelector((state) => state.user);
   const dispatch = useTypedDispatch();

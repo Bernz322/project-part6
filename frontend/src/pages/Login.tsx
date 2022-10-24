@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FC, FormEvent, useCallback, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button } from "../components";
@@ -8,7 +8,7 @@ import { useTypedDispatch, useTypedSelector } from "../hooks/rtk-hooks";
 import { isLoggedIn, validateEmail } from "../utils/helpers";
 import classes from "../styles/login.module.scss";
 
-const Login = () => {
+const Login: FC = () => {
   const { isLoading } = useTypedSelector((state) => state.auth);
   const dispatch = useTypedDispatch();
   const navigate = useNavigate();
