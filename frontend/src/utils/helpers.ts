@@ -6,7 +6,7 @@ import { IDeleteCookie, ISetCookie } from "../config/types";
  * @param {Array} data
  * @returns {Array}
  */
-export const tablePopulate = (data: any[]): any[] => {
+export const tablePopulate = <T>(data: T[]): T[] => {
   let len = data?.length;
   let size;
   size =
