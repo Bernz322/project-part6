@@ -10,8 +10,8 @@ export { default as Logout } from "./Logout";
 
 export { default as GroupChat } from "./GroupChat";
 
-// export { default as UsersList } from './UsersList';
-// export { default as EditUser } from './EditUser';
+export { default as UsersList } from "./UsersList";
+export { default as EditUser } from "./EditUser";
 
 // export { default as DocsList } from './DocsList';
 // export { default as Share } from './Share';

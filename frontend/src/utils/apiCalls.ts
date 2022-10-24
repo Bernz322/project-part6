@@ -96,23 +96,19 @@ export const fetchUserById = async (id: string): Promise<IUser> => {
   return res;
 };
 
-export const editUserById = async (
-  id: string,
-  name: string,
-  email: string
-): Promise<void> => {
-  const res = await apiRequest<void>(`/users/${id}`, {
-    method: "PUT",
+export const editUserById = async (user: IUser): Promise<IUser> => {
+  const res = await apiRequest<IUser>(`/users/${user.id}`, {
+    method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    data: { name, email },
+    data: user,
   });
   return res;
 };
 
-export const deleteUserById = async (id: string): Promise<void> => {
-  const res = await apiRequest<void>(`/users/${id}`, {
+export const deleteUserById = async (id: string): Promise<IUser> => {
+  const res = await apiRequest<IUser>(`/users/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

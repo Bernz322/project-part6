@@ -53,3 +53,44 @@ export interface IResponse {
   payload: any;
   type: string;
 }
+
+export interface ITableColumn {
+  title: string;
+}
+
+export interface ITableData {
+  id: string;
+  name: string;
+  email: string;
+  label?: string;
+  fileName?: string;
+  file?: string;
+}
+
+export interface ITableProps {
+  data: any; // have to be changed to IUser[] | IUploads[]
+  column: ITableColumn[];
+  tableName: string;
+  loading?: boolean;
+}
+
+export interface IModalProps {
+  show: boolean;
+  onHide: () => void;
+  data?: IRowData;
+}
+
+export interface IRowData {
+  item: IUser; // have to be changed to IUser[] | IUploads[]
+  type: string;
+}
+
+export interface IEditUserData {
+  meta: {
+    arg: string;
+    requestId: string;
+    requestStatus: string;
+  };
+  payload: any;
+  type: string;
+}
