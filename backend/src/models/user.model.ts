@@ -42,10 +42,10 @@ export class User extends Entity {
   })
   password: string;
 
-  @hasMany(() => Chat, {keyTo: 'sender_id'})
+  @hasMany(() => Chat, {keyTo: 'senderId'})
   messages: Chat[];
 
-  @hasMany(() => Upload, {keyTo: 'uploader_id'})
+  @hasMany(() => Upload, {keyTo: 'uploaderId'})
   uploads: Upload[];
 
   constructor(data?: Partial<User>) {

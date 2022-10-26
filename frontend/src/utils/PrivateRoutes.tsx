@@ -4,7 +4,7 @@ import { Navbar } from "../components";
 import { isLoggedIn } from "./helpers";
 
 const PrivateRoutes: FC = () => {
-  if (!isLoggedIn()) return <Navigate to="/" replace />;
+  if (!isLoggedIn()) return <Navigate to="/welcome" replace />;
 
   return (
     <>

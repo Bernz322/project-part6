@@ -90,7 +90,7 @@ table.globalTable > thead > tr > th:last-child {
     width: 50%;
 }
 
-table.globalTable > tbody > tr > td:nth-child(2) {
+table.globalTable > tbody > tr > td:first-child {
     text-align: left;
     padding-left: 10px;
 }
@@ -116,4 +116,10 @@ table.globalTable > tbody > tr > td:nth-child(2) {
             color: black;
         }
     }
+}
+
+.disabledAction {
+    cursor: pointer;
+    color: rgb(177, 177, 177);
+    pointer-events: none;
 }

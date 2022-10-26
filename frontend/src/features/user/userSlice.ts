@@ -93,7 +93,7 @@ export const fetchOneUserById = createAsyncThunk(
 );
 
 export const editOneUserById = createAsyncThunk(
-  "chat/editUserById",
+  "user/editUserById",
   async (data: IUser, thunkAPI) => {
     try {
       await editUserById(data);
@@ -113,7 +113,7 @@ export const editOneUserById = createAsyncThunk(
 );
 
 export const deleteOneUserById = createAsyncThunk(
-  "chat/deleteUserById",
+  "user/deleteUserById",
   async (id: string, thunkAPI) => {
     try {
       await deleteUserById(id);

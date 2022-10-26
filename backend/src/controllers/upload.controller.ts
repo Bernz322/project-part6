@@ -42,7 +42,7 @@ export class UploadController {
     @requestBody.file()
     request: Request,
     @inject(RestBindings.Http.RESPONSE) response: Response,
-  ): Promise<void> {
+  ): Promise<Upload> {
     const uploadConfig = new Promise<object>((resolve, reject) => {
       return this.handler(request, response, (err: unknown) => {
         if (err) reject(err);
@@ -52,8 +52,8 @@ export class UploadController {
       });
     });
 
-    const uploadData = await uploadConfig;
-    this.uploadRepository.create(uploadData);
+    const uploadToCreate = await uploadConfig;
+    return await this.uploadRepository.create(uploadToCreate);
   }
 
   /**
@@ -66,7 +66,7 @@ export class UploadController {
       label: request.body.label,
       fileName: request.body.fileName,
       fileLocation: uploadedFiles[0].filename,
-      uploader_id: request.body.uploader_id,
+      uploaderId: request.body.uploaderId,
       sharedTo: [],
     };
     return toSave;
@@ -154,7 +154,7 @@ export class UploadController {
     });
 
     const sharedIdArray = uploadData.sharedTo;
-    const uploader = _.toString(uploadData.uploader_id);
+    const uploader = _.toString(uploadData.uploaderId);
     const sharedToUsers = usersArray.filter(user =>
       sharedIdArray.includes(user.id),
     );
@@ -226,8 +226,10 @@ export class UploadController {
       },
     })
     upload: Upload,
-  ): Promise<void> {
+  ): Promise<{id: string; label: string}> {
     await this.uploadRepository.updateById(id, upload);
+    const uploadData: Upload = await this.uploadRepository.findById(id);
+    return {id: uploadData.id as string, label: uploadData.label};
   }
 
   @patch('/uploads/{id}/share')

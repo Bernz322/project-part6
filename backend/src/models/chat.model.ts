@@ -23,7 +23,7 @@ export class Chat extends Entity {
   time: string;
 
   @belongsTo(() => User, {name: 'user'})
-  sender_id: string;
+  senderId: string;
 
   constructor(data?: Partial<Chat>) {
     super(data);

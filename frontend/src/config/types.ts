@@ -21,7 +21,7 @@ export interface IUser {
 }
 export interface IMessage {
   id: string;
-  sender_id: string;
+  senderId: string;
   message: string;
   time: string;
   user: ISender;
@@ -30,19 +30,58 @@ export interface IMessage {
 export interface ISendMessage {
   message: string;
   time: string;
-  sender_id: string;
+  senderId: string;
 }
 export interface ISender {
   name: string;
   email?: string;
 }
-export interface IUpload {
-  _id: string;
-  file: string;
-  file_name: string;
+export interface IUploads {
+  id: string;
   label: string;
-  sharedTo?: ISender[];
-  uploader?: ISender[];
+  fileName: string;
+  fileLocation: string;
+  uploaderId: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface IOneUpload {
+  id: string;
+  label: string;
+  fileName: string;
+  fileLocation: string;
+  sharedTo: string[];
+  uploaderId: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  sharedToUsers: IUser[];
+  availToShare: IUser[];
+}
+export interface IUserUploads {
+  id: string;
+  label: string;
+  fileName: string;
+  fileLocation: string;
+  uploaderId: string;
+  sharedTo: string[];
+}
+
+export interface ISharedUploads {
+  id: string;
+  label: string;
+  fileName: string;
+  fileLocation: string;
+  uploaderId: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  sharedTo: string[];
 }
 
 export interface IResponse {
@@ -53,36 +92,61 @@ export interface IResponse {
   payload: any;
   type: string;
 }
-
-export interface ITableColumn {
-  title: string;
-}
-
 export interface ITableData {
   id: string;
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
   label?: string;
   fileName?: string;
+  fileLocation?: string;
   file?: string;
+  user?: {
+    name: string;
+    email: string;
+  };
+  uploaderId?: string;
+  sharedTo?: string[];
 }
-
 export interface ITableProps {
-  data: any; // have to be changed to IUser[] | IUploads[]
-  column: ITableColumn[];
+  data: IUser[] | ISharedUploads[] | IUserUploads[];
+  column: string[];
   tableName: string;
   loading?: boolean;
 }
 
-export interface IModalProps {
+export interface IDeleteModalProps {
   show: boolean;
   onHide: () => void;
-  data?: IRowData;
+  data?: IModalPropsData;
+  delete: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export interface IRowData {
-  item: IUser; // have to be changed to IUser[] | IUploads[]
+export interface IEditUploadModalProps {
+  show: boolean;
+  onHide: () => void;
+  data?: IEditUploadModalPropsData;
+  edit: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  setLabel: React.Dispatch<React.SetStateAction<IUploadDataEdit>>;
+}
+
+export interface IModalPropsData {
+  id: string;
   type: string;
+}
+
+export interface IEditUploadModalPropsData {
+  uploadToEditData: IUploadDataEdit;
+  type: string;
+}
+
+export interface IUploadDataEdit {
+  id: string;
+  label: string;
+}
+
+export interface IUploadDataAdd {
+  description: string;
+  file: any;
 }
 
 export interface IEditUserData {

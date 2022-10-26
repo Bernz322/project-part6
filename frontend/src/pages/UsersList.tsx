@@ -1,47 +1,50 @@
-import { FC, useEffect } from "react";
-import { toast } from "react-toastify";
-import { Table } from "../components";
-import { ITableColumn } from "../config/types";
-import { fetchAllUsers } from "../features/user/userSlice";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { DeleteModal, Table } from "../components";
+import { deleteOneUserById, fetchAllUsers } from "../features/user/userSlice";
 import { useTypedDispatch, useTypedSelector } from "../hooks/rtk-hooks";
 import classes from "../styles/users-list.module.scss";
 
 const UsersList: FC = () => {
   const { isLoading, users } = useTypedSelector((state) => state.user);
   const dispatch = useTypedDispatch();
-  let usersTable: string = "users";
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string>("");
+  const currentUserId = useMemo(() => localStorage.getItem("loggedUser"), []);
 
-  const tableColumn: ITableColumn[] = [
-    {
-      title: "Name",
-    },
-    {
-      title: "User Email ID",
-    },
-    {
-      title: "",
-    },
-  ];
+  const tableColumn: string[] = ["Name", "User Email ID", ""];
 
   useEffect(() => {
     const fetch = async () => {
-      try {
-        dispatch(fetchAllUsers());
-      } catch (error: any) {
-        toast.error(error.response.data.message);
-      }
+      dispatch(fetchAllUsers());
     };
     fetch();
   }, [dispatch]);
 
+  const handleDelete = useCallback((id: string) => {
+    setShowModal(true);
+    setUserId(id);
+  }, []);
+  const deleteUser = useCallback(() => {
+    dispatch(deleteOneUserById(userId));
+    setShowModal(false);
+  }, [dispatch, userId]);
   return (
     <div className={classes.container}>
       <h3>Users</h3>
       <Table
         data={users}
-        column={tableColumn}
-        tableName={usersTable}
+        isAction
+        colHeaders={tableColumn}
         loading={isLoading}
+        onEditUser
+        onDelete={handleDelete}
+        currentUser={currentUserId}
+      />
+      <DeleteModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        data={{ id: userId, type: "usersTable" }}
+        delete={deleteUser}
       />
     </div>
   );

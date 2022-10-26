@@ -1,4 +1,4 @@
-import {Filter, repository} from '@loopback/repository';
+import {Filter, FilterExcludingWhere, repository} from '@loopback/repository';
 import {
   post,
   param,
@@ -34,7 +34,17 @@ export class ChatController {
     })
     chat: Omit<Chat, 'id'>,
   ): Promise<Chat> {
-    return this.chatRepository.create(chat);
+    const chatMessage = await this.chatRepository.create(chat);
+    return this.chatRepository.findById(chatMessage.id, {
+      include: [
+        {
+          relation: 'user',
+          scope: {
+            fields: {id: false, password: false},
+          },
+        },
+      ],
+    });
   }
 
   @get('/chats')
@@ -51,6 +61,35 @@ export class ChatController {
   })
   async find(@param.filter(Chat) filter?: Filter<Chat>): Promise<Chat[]> {
     return this.chatRepository.find({
+      include: [
+        {
+          relation: 'user',
+          scope: {
+            fields: {id: false, password: false},
+          },
+        },
+      ],
+    });
+  }
+
+  @get('/chats/{id}')
+  @response(200, {
+    description: 'Return user by ID',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Chat, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findById(
+    @param.path.string('id') id: string,
+    @param.filter(Chat, {exclude: 'where'}) filter?: FilterExcludingWhere<Chat>,
+  ): Promise<Chat[]> {
+    return this.chatRepository.find({
+      where: {senderId: id},
       include: [
         {
           relation: 'user',

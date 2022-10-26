@@ -1,6 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { Navigate, Route, Routes } from "react-router-dom";
 import {
+  DocsList,
   EditUser,
   ErrorPage,
   GroupChat,
@@ -27,7 +28,7 @@ function App() {
           <Route element={<GroupChat />} path="/group-chat" />
           <Route element={<UsersList />} path="/users-list" />
           <Route element={<EditUser />} path="/edit-user/:id" />
-          {/* <Route element={<DocsList />} path="/docs-list" /> */}
+          <Route element={<DocsList />} path="/docs-list" />
           {/* <Route element={<Share />} path="/share/:id" /> */}
         </Route>
         <Route element={<Logout />} path="/logout" />
