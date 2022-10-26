@@ -20,5 +20,5 @@ export type UploadGetById = {
   fileName: string;
   fileLocation: string;
   sharedTo?: string[] | undefined;
-  uploader_id: string;
+  uploaderId: string;
 };

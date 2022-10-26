@@ -43,7 +43,7 @@ export class Upload extends Entity {
   sharedTo: string[];
 
   @belongsTo(() => User, {name: 'user'})
-  uploader_id: string;
+  uploaderId: string;
 
   constructor(data?: Partial<Upload>) {
     super(data);

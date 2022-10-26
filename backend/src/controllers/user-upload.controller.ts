@@ -58,7 +58,7 @@ export class UserUploadController {
   ): Promise<Count> {
     const uploads = await this.uploadRepository.find(
       {
-        where: {uploader_id: id},
+        where: {uploaderId: id},
       },
       {
         fields: ['fileLocation'],
