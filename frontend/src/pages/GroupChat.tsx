@@ -43,14 +43,13 @@ const GroupChat: FC = () => {
     if (message.trim() === "") return toast.warn("Message is required");
 
     const messageData: ISendMessage = {
-      sender_id: currentUser?.id,
+      senderId: currentUser?.id,
       message,
       time: date,
     };
     try {
       dispatch(sendChatMessage(messageData));
       setMessage("");
-      dispatch(fetchAllMessage());
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

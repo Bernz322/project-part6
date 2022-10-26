@@ -3,11 +3,20 @@ import {
   IUser,
   ILoginResponse,
   IMessage,
-  IUpload,
+  IUploads,
   ISendMessage,
+  IOneUpload,
+  IUserUploads,
+  ISharedUploads,
 } from "../config/types";
 import { getCookie, setCookie } from "./helpers";
 
+/**
+ * API Request wrapper which returns data directly from response (res.data)
+ * @param {string} path
+ * @param {object} config
+ * @returns
+ */
 const apiRequest = async <T>(
   path: string,
   config: AxiosRequestConfig = {}
@@ -31,6 +40,12 @@ const apiRequest = async <T>(
   return data as T;
 };
 
+/**
+ * Login API Request. If success, create a cookie with 24 hours duration storing Bearer token and set loggedUser id to local storage
+ * @param {string} email
+ * @param {string} password
+ * @returns {ILoginResponse} ILoginResponse {name, email, id, token}
+ */
 export const login = async (
   email: string,
   password: string
@@ -42,7 +57,6 @@ export const login = async (
     },
     data: { email, password },
   });
-  console.log(res);
   if (res) {
     setCookie({ cookieName: "accessToken", value: res.id, daysToExpire: 1 });
     localStorage.setItem("loggedUser", JSON.stringify(res.id));
@@ -50,6 +64,12 @@ export const login = async (
   return res;
 };
 
+/**
+ * Register API Request. After a successful registration, redirect to register success page
+ * @param {string} name
+ * @param {string} email
+ * @param {string} password
+ */
 export const register = async (
   name: string,
   email: string,
@@ -64,6 +84,10 @@ export const register = async (
   });
 };
 
+/**
+ * Fetch current logged in user by providing id inside local storage
+ * @returns {IUser} IUser {name, email, id}
+ */
 export const fetchLoggedInUser = async (): Promise<IUser> => {
   const id = JSON.parse(localStorage.getItem("loggedUser") || "");
   const res = await apiRequest<IUser>(`/users/${id}`);
@@ -117,28 +141,43 @@ export const deleteUserById = async (id: string): Promise<IUser> => {
   return res;
 };
 
-export const fetchUserUploads = async (): Promise<IUpload[]> => {
+/**
+ * Fetch all uploads of current logged in user
+ * @returns {IUserUploads}
+ */
+export const fetchUserUploads = async (): Promise<IUserUploads[]> => {
   const id = JSON.parse(localStorage.getItem("loggedUser") || "");
-  const res = await apiRequest<IUpload[]>(`/uploads/${id}`);
+  const res = await apiRequest<IUserUploads[]>(`/users/${id}/uploads`);
   return res;
 };
 
-export const fetchUploads = async (): Promise<IUpload[]> => {
-  const res = await apiRequest<IUpload[]>(`/uploads/`);
+/**
+ * Fetch all uploads in the db
+ * @returns {IUploads}
+ */
+export const fetchUploads = async (): Promise<IUploads[]> => {
+  const res = await apiRequest<IUploads[]>(`/uploads`);
   return res;
 };
 
-export const fetchUploadById = async (id: string): Promise<IUpload[]> => {
-  const res = await apiRequest<IUpload[]>(`/uploads/single/${id}`);
+/**
+ * Fetch all uploads shared to the current logged in user
+ * @returns {ISharedUploads}
+ */
+export const fetchSharedUploads = async (): Promise<ISharedUploads[]> => {
+  const id = JSON.parse(localStorage.getItem("loggedUser") || "");
+  const res = await apiRequest<ISharedUploads[]>(`/uploads/user/${id}`);
   return res;
 };
 
-export const addUpload = async (form: any): Promise<IUpload> => {
-  const res = await apiRequest<IUpload>(`/uploads`, {
+export const fetchUploadById = async (id: string): Promise<IOneUpload> => {
+  const res = await apiRequest<IOneUpload>(`/uploads/${id}`);
+  return res;
+};
+
+export const addUpload = async (form: FormData): Promise<IOneUpload> => {
+  const res = await apiRequest<IOneUpload>(`/uploads`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     data: form,
   });
   return res;
@@ -147,22 +186,24 @@ export const addUpload = async (form: any): Promise<IUpload> => {
 export const editUploadById = async (
   id: string,
   label: string
-): Promise<{ label: string }> => {
-  const res = await apiRequest<{ label: string }>(
-    `/uploads/single/edit/${id}`,
+): Promise<{ id: string; label: string }> => {
+  console.log(id);
+  console.log(label);
+  const res = await apiRequest<{ id: string; label: string }>(
+    `/uploads/${id}`,
     {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      data: label,
+      data: { label },
     }
   );
   return res;
 };
 
 export const deleteUploadById = async (id: string): Promise<void> => {
-  const res = await apiRequest<void>(`/uploads/single/delete/${id}`, {
+  const res = await apiRequest<void>(`/uploads/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -175,7 +216,7 @@ export const shareUploadToUser = async (
   uploadId: string,
   userId: string
 ): Promise<void> => {
-  const res = await apiRequest<void>(`/uploads/single/share/${uploadId}`, {
+  const res = await apiRequest<void>(`/uploads/${uploadId}/share/`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -190,7 +231,7 @@ export const unshareUploadToUser = async (
   uploadId: string,
   userId: string
 ): Promise<void> => {
-  const res = await apiRequest<void>(`/uploads/single/remove/${uploadId}`, {
+  const res = await apiRequest<void>(`/uploads/${uploadId}/unshare/`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
