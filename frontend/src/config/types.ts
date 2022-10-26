@@ -128,6 +128,13 @@ export interface IEditUploadModalProps {
   edit: (event: React.MouseEvent<HTMLButtonElement>) => void;
   setLabel: React.Dispatch<React.SetStateAction<IUploadDataEdit>>;
 }
+export interface IAddUploadModalProps {
+  show: boolean;
+  onHide: () => void;
+  data?: IAddUploadModalPropsData;
+  add: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  setUploadData: React.Dispatch<React.SetStateAction<IUploadDataAdd>>;
+}
 
 export interface IModalPropsData {
   id: string;
@@ -136,6 +143,10 @@ export interface IModalPropsData {
 
 export interface IEditUploadModalPropsData {
   uploadToEditData: IUploadDataEdit;
+  type: string;
+}
+export interface IAddUploadModalPropsData {
+  uploadToAddData: IUploadDataAdd;
   type: string;
 }
 

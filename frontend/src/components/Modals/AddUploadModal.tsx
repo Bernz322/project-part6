@@ -1,46 +1,16 @@
 import { Modal } from "react-bootstrap/";
 import { Button } from "..";
 import { useTypedSelector } from "../../hooks/rtk-hooks";
-import { IUploadDataAdd } from "../../config/types";
+import { IAddUploadModalProps, IUploadDataAdd } from "../../config/types";
 import "./modal.scss";
 
-const AddUploadModal = (props: any) => {
+const AddUploadModal = (props: IAddUploadModalProps) => {
   const { isLoading } = useTypedSelector((state) => state.upload);
   let buttonUploadText: string = "Upload now";
   let buttonCancelText: string = "Cancel";
   let buttonType: string = "add";
   let buttonVariant: string = "dark";
 
-  //   const handleSubmit = async () => {
-  //     if (description.trim() === "") {
-  //       return toast.warn("Description is required!");
-  //     }
-  //     if (file === null || !file) {
-  //       return toast.warn("File is required!");
-  //     }
-
-  //     dispatch(addUploadStart());
-  //     dispatch(getCurrentUserUploadsStart());
-
-  //     const form = new FormData();
-  //     form.append("file", file);
-  //     form.append("label", description.trim());
-  //     form.append("fileName", file.name);
-  //     form.append("uploaderId", loggedInUserID);
-
-  //     try {
-  //       const res = await addUpload(form);
-  //       dispatch(addUploadSuccess(res));
-  //       const currentUserUploads = await fetchUserUploads();
-  //       dispatch(getCurrentUserUploadsSuccess(currentUserUploads));
-  //       setDescription("");
-  //       setFile(null);
-  //       props.onHide();
-  //     } catch (error) {
-  //       dispatch(addUploadFailed());
-  //       toast.error(error.response.data.message);
-  //     }
-  //   };
   return (
     <>
       <Modal
@@ -61,7 +31,9 @@ const AddUploadModal = (props: any) => {
                 <label htmlFor="description">File Description</label>
                 <input
                   type="text"
-                  value={props?.data?.uploadToAdd?.description as string}
+                  defaultValue={
+                    props?.data?.uploadToAddData?.description as string
+                  }
                   name="description"
                   id="description"
                   placeholder="Sample File"
