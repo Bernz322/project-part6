@@ -187,8 +187,6 @@ export const editUploadById = async (
   id: string,
   label: string
 ): Promise<{ id: string; label: string }> => {
-  console.log(id);
-  console.log(label);
   const res = await apiRequest<{ id: string; label: string }>(
     `/uploads/${id}`,
     {
