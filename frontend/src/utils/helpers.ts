@@ -7,21 +7,22 @@ import { IDeleteCookie, ISetCookie } from "../config/types";
  * @returns {Array}
  */
 export const tablePopulate = <T>(data: T[]): T[] => {
-  let len = data?.length;
-  let size;
-  size =
-    len === 0
-      ? (size = 5)
-      : len === 1
-      ? (size = 4)
-      : len === 2
-      ? (size = 3)
-      : len === 3
-      ? (size = 2)
-      : len === 4
-      ? (size = 1)
-      : (size = 1);
-  let filteredData = [];
+  let len: number = data?.length;
+  let size: number;
+  if (len === 0) {
+    size = 5;
+  } else if (len === 1) {
+    size = 4;
+  } else if (len === 2) {
+    size = 3;
+  } else if (len === 3) {
+    size = 2;
+  } else if (len === 4) {
+    size = 1;
+  } else {
+    size = 1;
+  }
+  let filteredData: T[] = [];
 
   for (let i = 0; i < len + size; i++) {
     filteredData.push(data[i]);
@@ -36,8 +37,8 @@ export const tablePopulate = <T>(data: T[]): T[] => {
  * @returns {boolean}
  */
 export const validateEmail = (email: string): boolean => {
-  let atPosition = email.indexOf("@");
-  let dotPosition = email.lastIndexOf(".");
+  let atPosition: number = email.indexOf("@");
+  let dotPosition: number = email.lastIndexOf(".");
 
   if (atPosition < 1 || dotPosition - atPosition < 2) {
     return true;
@@ -51,7 +52,7 @@ export const validateEmail = (email: string): boolean => {
  * @returns {boolean}
  */
 export const validName = (name: string): boolean => {
-  var nameRegex = /^(?!-)[a-zA-Z-]*[a-zA-Z]$/;
+  let nameRegex: RegExp = /^(?!-)[a-zA-Z-]*[a-zA-Z]$/;
   if (name.match(nameRegex) == null) {
     return false;
   } else {
@@ -65,7 +66,9 @@ export const validName = (name: string): boolean => {
  * @returns {boolean | string}
  */
 export const getCookie = (name: string): boolean | string => {
-  let match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  let match: RegExpMatchArray | null = document.cookie.match(
+    new RegExp("(^| )" + name + "=([^;]+)")
+  );
   if (match) {
     return match[2];
   } else {
@@ -85,8 +88,8 @@ export const setCookie = ({
   value,
   daysToExpire,
 }: ISetCookie): void => {
-  const toStore = value;
-  let currentDate = new Date();
+  const toStore: string = value;
+  let currentDate: Date = new Date();
   currentDate.setDate(currentDate.getDate() + daysToExpire);
   document.cookie =
     cookieName +
